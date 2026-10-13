@@ -1,0 +1,36 @@
+## Redis 鉴权插件配置（等价于 unmtr369auth 服务的 /mqtt/verify）
+## 通过 Dashboard 插件配置或 REST API 修改：
+##   PUT /api/v5/plugins/emqx_plugin_redis_auth-1.0.0/config
+
+## Redis 连接地址
+redis_host = "127.0.0.1"
+redis_port = 6379
+redis_password = ""
+redis_database = 0
+
+## Redis 连接池与超时
+redis_pool_size = 8
+redis_reconnect_sleep_ms = 1000
+redis_query_timeout_ms = 2000
+
+## Redis 业务键前缀（对应 Java 的 STR_INDEX_UID2ID / STR_AP）
+snindex_key_prefix = "snindex:"
+ap_key_prefix = "ap:"
+ap_status_field = "status"
+## AP hash 中该值表示主通道离线（其余非空值视为在线）
+ap_status_offline = "0"
+
+## clientId 包含该标记时按保活通道处理，并尝试从 "MAC-Tag" 中提取真实 MAC
+keepalived_tag = "Tr369KeepAlived"
+
+## 白名单用户名：命中直接放行（对应 Java whiteServiceList）
+white_service_list = ["unmtr369service", "unmtr369bulkdataservice", "unmtr369accessservice"]
+
+## 平台管理账号（对应 Java 的 UNM2000 校验）
+unm_username = "UNM2000"
+unm_expected_password = "Umc2024@Adm"
+## 密码为 base64(AES-128-CBC/NoPadding, 零IV, 零填充) 密文，密钥对应 Java AESUtil.AES_KEY
+aes_key = "Fiber#Aes@369069"
+
+## Redis 不可用时是否降级放行（对应 Java catch 后 return allow）
+fallback_allow_on_redis_error = true

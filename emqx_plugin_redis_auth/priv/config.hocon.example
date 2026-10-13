@@ -1,0 +1,34 @@
+## Redis 鉴权插件配置示例
+
+emqx_plugin_redis_auth {
+  ## Redis 连接地址
+  redis_host = "127.0.0.1"
+  redis_port = 6379
+  redis_password = ""
+  redis_database = 0
+
+  ## Redis 连接池与超时
+  redis_pool_size = 8
+  redis_reconnect_sleep_ms = 1000
+  redis_query_timeout_ms = 2000
+
+  ## Redis 业务键前缀
+  snindex_key_prefix = "snindex:"
+  ap_key_prefix = "ap:"
+  ap_status_field = "status"
+  ap_status_offline = "0"
+
+  ## 保活通道标记
+  keepalived_tag = "Tr369KeepAlived"
+
+  ## 白名单用户名
+  white_service_list = ["unmtr369service", "unmtr369bulkdataservice", "unmtr369accessservice"]
+
+  ## 平台管理账号
+  unm_username = "UNM2000"
+  unm_expected_password = "Umc2024@Adm"
+  aes_key = "Fiber#Aes@369069"
+
+  ## Redis 不可用时降级放行
+  fallback_allow_on_redis_error = true
+}

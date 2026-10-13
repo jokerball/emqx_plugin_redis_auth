@@ -1,0 +1,111 @@
+{
+  "type": "record",
+  "name": "emqx_plugin_redis_auth",
+  "fields": [
+    {
+      "name": "redis_host",
+      "type": "string",
+      "default": "127.0.0.1",
+      "description": "Redis server host"
+    },
+    {
+      "name": "redis_port",
+      "type": "int",
+      "default": 6379,
+      "description": "Redis server port"
+    },
+    {
+      "name": "redis_password",
+      "type": "string",
+      "default": "",
+      "description": "Redis password (empty for no auth)"
+    },
+    {
+      "name": "redis_database",
+      "type": "int",
+      "default": 0,
+      "description": "Redis database index"
+    },
+    {
+      "name": "redis_pool_size",
+      "type": "int",
+      "default": 8,
+      "description": "eredis connection pool size"
+    },
+    {
+      "name": "redis_reconnect_sleep_ms",
+      "type": "int",
+      "default": 1000,
+      "description": "Sleep time (ms) before reconnecting to redis"
+    },
+    {
+      "name": "redis_query_timeout_ms",
+      "type": "int",
+      "default": 2000,
+      "description": "Timeout (ms) for a single redis query"
+    },
+    {
+      "name": "snindex_key_prefix",
+      "type": "string",
+      "default": "snindex:",
+      "description": "Redis key prefix for device SN/MAC index (Java STR_INDEX_UID2ID)"
+    },
+    {
+      "name": "ap_key_prefix",
+      "type": "string",
+      "default": "ap:",
+      "description": "Redis key prefix for AP info hash (Java STR_AP)"
+    },
+    {
+      "name": "ap_status_field",
+      "type": "string",
+      "default": "status",
+      "description": "Hash field name for AP status"
+    },
+    {
+      "name": "ap_status_offline",
+      "type": "string",
+      "default": "0",
+      "description": "Hash field value meaning the AP main channel is offline"
+    },
+    {
+      "name": "keepalived_tag",
+      "type": "string",
+      "default": "Tr369KeepAlived",
+      "description": "clientId substring identifying a keepalived channel (Java KEEAPALIVED_MAC_TAG)"
+    },
+    {
+      "name": "white_service_list",
+      "type": {
+        "type": "array",
+        "items": "string"
+      },
+      "default": ["unmtr369service", "unmtr369bulkdataservice", "unmtr369accessservice"],
+      "description": "Usernames that bypass authentication (Java whiteServiceList)"
+    },
+    {
+      "name": "unm_username",
+      "type": "string",
+      "default": "UNM2000",
+      "description": "Platform management account username"
+    },
+    {
+      "name": "unm_expected_password",
+      "type": "string",
+      "default": "Umc2024@Adm",
+      "description": "Expected plaintext password for unm_username after AES decryption"
+    },
+    {
+      "name": "aes_key",
+      "type": "string",
+      "default": "Fiber#Aes@369069",
+      "description": "AES-128 key (16 bytes) used to decrypt unm_username password (Java AESUtil.AES_KEY)"
+    },
+    {
+      "name": "fallback_allow_on_redis_error",
+      "type": "boolean",
+      "default": true,
+      "description": "Allow the connection when redis is unavailable, mirroring the Java service degradation"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "$redis_host_label": {
+    "zh": "Redis 地址",
+    "en": "Redis Host"
+  },
+  "$redis_host_desc": {
+    "zh": "Redis 服务器地址。",
+    "en": "Redis server host."
+  },
+  "$redis_port_label": {
+    "zh": "端口",
+    "en": "Port"
+  },
+  "$redis_port_desc": {
+    "zh": "Redis 服务器端口。",
+    "en": "Redis server port."
+  },
+  "$redis_password_label": {
+    "zh": "密码",
+    "en": "Password"
+  },
+  "$redis_password_desc": {
+    "zh": "Redis 密码，无密码留空。",
+    "en": "Redis password, leave empty when no auth is required."
+  },
+  "$white_service_list_label": {
+    "zh": "白名单用户名",
+    "en": "White Service List"
+  },
+  "$white_service_list_desc": {
+    "zh": "命中白名单的用户名直接放行，不做任何校验。",
+    "en": "Usernames in this list bypass authentication."
+  },
+  "$fallback_allow_on_redis_error_label": {
+    "zh": "Redis 故障时放行",
+    "en": "Fallback Allow"
+  },
+  "$fallback_allow_on_redis_error_desc": {
+    "zh": "Redis 不可用时是否降级放行，避免所有设备无法接入。",
+    "en": "Allow connections when redis is unavailable to avoid locking out all devices."
+  },
+  "$aes_key_label": {
+    "zh": "AES 密钥",
+    "en": "AES Key"
+  },
+  "$aes_key_desc": {
+    "zh": "用于解密平台管理账号密码的 AES-128 密钥（16 字节）。",
+    "en": "AES-128 key (16 bytes) used to decrypt the platform account password."
+  }
+}
