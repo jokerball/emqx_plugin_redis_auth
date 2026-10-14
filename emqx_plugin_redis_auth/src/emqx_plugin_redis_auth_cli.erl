@@ -10,7 +10,7 @@ cmd(["get-config"]) ->
     Config = emqx_plugin_redis_auth:get_config(),
     emqx_ctl:print("~s~n", [emqx_utils_json:encode(Config)]);
 cmd(["status"]) ->
-    case catch eredis:q(eredis_pool, ["PING"], 2000) of
+    case emqx_plugin_redis_auth:ping() of
         {ok, <<"PONG">>} ->
             emqx_ctl:print("Redis auth: running (PONG)~n");
         Other ->

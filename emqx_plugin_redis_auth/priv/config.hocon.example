@@ -7,7 +7,8 @@ emqx_plugin_redis_auth {
   redis_password = ""
   redis_database = 0
 
-  ## Redis 连接池与超时
+  ## Redis 客户端连接数与超时（eredis 为单连接客户端，此处起 N 条连接，
+  ## 查询按 redis key 哈希分摊）
   redis_pool_size = 8
   redis_reconnect_sleep_ms = 1000
   redis_query_timeout_ms = 2000

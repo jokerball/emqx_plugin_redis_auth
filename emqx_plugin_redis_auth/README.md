@@ -48,7 +48,7 @@ curl -u <apikey>:<secret> -X PUT \
 |---|---|---|
 | redis_host / redis_port | 127.0.0.1 / 6379 | Redis 地址 |
 | redis_password / redis_database | "" / 0 | 密码与库号 |
-| redis_pool_size | 8 | eredis 连接池 |
+| redis_pool_size | 8 | Redis 客户端连接数（eredis 无内置连接池，按 key 哈希分摊到 N 条连接） |
 | redis_query_timeout_ms | 2000 | 单次查询超时 |
 | snindex_key_prefix | snindex: | 设备索引键前缀（Java STR_INDEX_UID2ID） |
 | ap_key_prefix / ap_status_field | ap: / status | AP 信息 hash 键前缀与字段 |

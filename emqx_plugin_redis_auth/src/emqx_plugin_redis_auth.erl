@@ -36,7 +36,8 @@
 -export([
     on_config_changed/2,
     on_health_check/1,
-    get_config/0
+    get_config/0,
+    ping/0
 ]).
 
 %% 'client.authenticate' hook callback
@@ -231,19 +232,58 @@ trim_zero_padding(N, Bin) ->
 
 redis_q(Config, Command) ->
     Timeout = conf(<<"redis_query_timeout_ms">>, Config, 2000),
-    try
-        eredis:q(eredis_pool, Command, Timeout)
-    catch
-        Class:Reason ->
-            {error, {Class, Reason}}
+    case pick_client(Command) of
+        undefined ->
+            {error, no_connection};
+        Pid ->
+            try
+                eredis:q(Pid, Command, Timeout)
+            catch
+                Class:Reason ->
+                    {error, {Class, Reason}}
+            end
     end.
+
+ping() ->
+    case pick_client(["PING"]) of
+        undefined ->
+            {error, no_connection};
+        Pid ->
+            try
+                eredis:q(Pid, ["PING"], 2000)
+            catch
+                Class:Reason ->
+                    {error, {Class, Reason}}
+            end
+    end.
+
+%% eredis has no built-in pool: the supervisor starts `redis_pool_size`
+%% single eredis clients, and commands are hashed across them so the same
+%% redis key always lands on the same connection.
+pick_client(Command) ->
+    case redis_pids() of
+        [] ->
+            undefined;
+        Pids ->
+            lists:nth(erlang:phash2(Command, length(Pids)) + 1, Pids)
+    end.
+
+redis_pids() ->
+    [
+        Pid
+     || {Id, Pid, _, _} <- supervisor:which_children(emqx_plugin_redis_auth_sup),
+        is_eredis_client_id(Id)
+    ].
+
+is_eredis_client_id({eredis_client, _}) -> true;
+is_eredis_client_id(_) -> false.
 
 %%--------------------------------------------------------------------
 %% Plugin config callbacks
 %%--------------------------------------------------------------------
 
 on_health_check(_Options) ->
-    case catch eredis:q(eredis_pool, ["PING"], 2000) of
+    case ping() of
         {ok, <<"PONG">>} ->
             ok;
         Other ->

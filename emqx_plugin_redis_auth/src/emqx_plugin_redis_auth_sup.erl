@@ -26,21 +26,25 @@ init([]) ->
             shutdown => 5000,
             type => worker,
             modules => [emqx_plugin_redis_auth]
-        },
-        redis_pool_spec()
+        }
+        | redis_client_specs()
     ],
     {ok, {SupFlags, ChildSpecs}}.
 
-%% @doc Rebuild the eredis pool child spec from the current plugin config.
+%% @doc Rebuild the eredis client children from the current plugin config.
 %% Used to hot-apply redis connection parameter changes.
 restart_pool() ->
-    Spec = redis_pool_spec(),
-    _ = supervisor:terminate_child(?MODULE, eredis_pool),
-    _ = supervisor:delete_child(?MODULE, eredis_pool),
-    {ok, _} = supervisor:start_child(?MODULE, Spec),
+    OldSpecs = redis_client_specs(),
+    Ids = [maps:get(id, Spec) || Spec <- OldSpecs],
+    _ = [supervisor:terminate_child(?MODULE, Id) || Id <- Ids],
+    _ = [supervisor:delete_child(?MODULE, Id) || Id <- Ids],
+    NewSpecs = redis_client_specs(),
+    {ok, _} = supervisor:start_children(?MODULE, NewSpecs),
     ok.
 
-redis_pool_spec() ->
+%% eredis (wooga) has no built-in connection pool: we start `redis_pool_size`
+%% plain eredis clients and the caller hashes redis keys across them.
+redis_client_specs() ->
     Config = get_plugin_config(),
     Host = binary_to_list(maps:get(<<"redis_host">>, Config, <<"127.0.0.1">>)),
     Port = maps:get(<<"redis_port">>, Config, 6379),
@@ -54,20 +58,23 @@ redis_pool_spec() ->
     PoolSize = maps:get(<<"redis_pool_size">>, Config, 8),
     ReconnectSleep = maps:get(<<"redis_reconnect_sleep_ms">>, Config, 1000),
     ?SLOG(debug, #{
-        msg => "redis_auth_pool_starting",
+        msg => "redis_auth_clients_starting",
         host => list_to_binary(Host),
         port => Port,
         database => Database,
         pool_size => PoolSize
     }),
-    #{
-        id => eredis_pool,
-        start => {eredis, start_link, [PoolSize, Host, Port, Database, Password, ReconnectSleep]},
-        restart => permanent,
-        shutdown => 5000,
-        type => supervisor,
-        modules => [eredis]
-    }.
+    [
+        #{
+            id => {eredis_client, I},
+            start => {eredis, start_link, [Host, Port, Database, Password, ReconnectSleep]},
+            restart => permanent,
+            shutdown => 5000,
+            type => worker,
+            modules => [eredis]
+        }
+     || I <- lists:seq(1, PoolSize)
+    ].
 
 %% Read config straight from emqx_plugin_helper: at supervisor startup the
 %% plugin gen_server has not cached the config yet, and on config change
